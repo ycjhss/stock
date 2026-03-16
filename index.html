@@ -573,21 +573,21 @@ select{-webkit-appearance:none;appearance:none;padding-right:28px!important;
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
       <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:12px">
         <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);margin-bottom:5px">STEP 01</div>
-        <div style="font-size:12px;color:var(--text2);line-height:1.6"><a href="https://console.anthropic.com" target="_blank" style="color:var(--accent);text-decoration:none">console.anthropic.com</a> 접속 후 로그인</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.6"><a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--accent);text-decoration:none">aistudio.google.com/apikey</a> 접속 후 로그인</div>
       </div>
       <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:12px">
         <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);margin-bottom:5px">STEP 02</div>
-        <div style="font-size:12px;color:var(--text2);line-height:1.6">왼쪽 메뉴 <b style="color:var(--text)">API Keys</b> → <b style="color:var(--text)">Create Key</b></div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.6"><b style="color:var(--text)">Create API Key</b> 버튼 클릭</div>
       </div>
       <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:12px">
         <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);margin-bottom:5px">STEP 03</div>
-        <div style="font-size:12px;color:var(--text2);line-height:1.6">생성된 키 전체 복사 후 아래 입력</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.6">생성된 키 전체 복사 후 아래 입력 (<b style="color:var(--text)">AIza</b>로 시작)</div>
       </div>
     </div>
 
     <!-- 키 입력 -->
     <div style="position:relative;margin-bottom:8px">
-      <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-XXXX...XXXX (전체 붙여넣기)"
+      <input type="password" id="apiKeyInput" placeholder="AIzaSy... (Google AI Studio 키 붙여넣기)"
         style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:13px 44px 13px 14px;border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:'DM Mono',monospace;transition:border-color 0.2s"
         oninput="validateKeyInput(this)"
         onfocus="this.style.borderColor='var(--accent)'"
@@ -609,7 +609,7 @@ select{-webkit-appearance:none;appearance:none;padding-right:28px!important;
       <div style="font-size:11px;color:var(--text3);line-height:1.9">
         🔒 키는 <b style="color:var(--text2)">본인 브라우저에만 저장</b>되며 서버로 전송되지 않습니다<br>
         💰 분석 1회 비용: 약 <b style="color:var(--text2)">$0.003~0.01 (4~15원)</b> 수준<br>
-        ⚠️ 키가 <b style="color:var(--text2)">sk-ant-</b>로 시작하는지 확인하세요<br>
+        ⚠️ 키가 <b style="color:var(--text2)">AIza</b>로 시작하는지 확인하세요<br>
         ❓ 오류 발생 시 키를 삭제 후 다시 복사·저장해 보세요
       </div>
     </div>
@@ -624,7 +624,7 @@ select{-webkit-appearance:none;appearance:none;padding-right:28px!important;
     <div class="card-label">시스템 정보</div>
     <div style="font-size:13px;color:var(--text2);line-height:2">
       <div>플랫폼: <span style="color:var(--accent);font-family:'DM Mono',monospace">주식 인텔리전스 v2.0</span></div>
-      <div>AI 모델: <span style="color:var(--accent);font-family:'DM Mono',monospace">Claude claude-sonnet-4-20250514 + Web Search</span></div>
+      <div>AI 모델: <span style="color:var(--accent);font-family:'DM Mono',monospace">Gemini 2.0 Flash + Google Search</span></div>
       <div>분석 방식: <span style="color:var(--text)">10대 요인 다변량 분석 + 실시간 웹 검색</span></div>
       <div>지원 시장: <span style="color:var(--text)">코스피·코스닥·코넥스</span></div>
       <div style="margin-top:10px;padding:10px;background:rgba(247,97,95,0.07);border:1px solid rgba(247,97,95,0.15);border-radius:var(--radius-sm);font-size:12px;color:var(--text3)">
@@ -647,7 +647,7 @@ function validateKeyInput(el){
   const v=el.value.trim();
   const icon=document.getElementById('keyInputIcon');
   if(!v){icon.textContent='';el.style.borderColor='var(--border)';return}
-  if(v.startsWith('sk-ant-')&&v.length>30){el.style.borderColor='var(--green)';icon.textContent='✓';icon.style.color='var(--green)';}
+  if(v.startsWith('AIza')&&v.length>30){el.style.borderColor='var(--green)';icon.textContent='✓';icon.style.color='var(--green)';}
   else{el.style.borderColor='var(--red)';icon.textContent='✗';icon.style.color='var(--red)';}
 }
 (function init(){
@@ -664,8 +664,8 @@ function validateKeyInput(el){
 function saveKey(){
   const v = document.getElementById('apiKeyInput').value.trim();
   if(!v){alert('API 키를 입력해주세요');return}
-  if(!v.startsWith('sk-ant-')){
-    alert('⚠️ 올바른 API 키 형식이 아닙니다.\n\n키는 반드시 sk-ant- 로 시작해야 합니다.\nconsole.anthropic.com → API Keys 에서\n키를 처음부터 끝까지 다시 복사해주세요.');
+  if(!v.startsWith('AIza')){
+    alert('⚠️ 올바른 API 키 형식이 아닙니다.\n\n키는 반드시 AIza 로 시작해야 합니다.\naistudio.google.com/apikey 에서\n키를 처음부터 끝까지 다시 복사해주세요.');
     return;
   }
   API_KEY = v;
@@ -703,23 +703,30 @@ function showErr(id, m){
 
 /* ─ AI CALL ─ */
 async function callAI(sys, prompt){
-  if(!API_KEY) throw new Error('API 키가 설정되지 않았습니다. 설정 탭에서 Anthropic API 키를 입력해주세요.');
-  const r = await fetch('https://api.anthropic.com/v1/messages',{
+  if(!API_KEY) throw new Error('API 키가 설정되지 않았습니다. 설정 탭에서 Google AI Studio API 키를 입력해주세요.');
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+  const body = {
+    systemInstruction:{parts:[{text: sys}]},
+    contents:[{role:'user', parts:[{text: prompt}]}],
+    tools:[{googleSearch:{}}],
+    generationConfig:{temperature:0.3, maxOutputTokens:2000}
+  };
+  const r = await fetch(url,{
     method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({
-      model:'claude-sonnet-4-20250514',
-      max_tokens:2000,
-      tools:[{type:'web_search_20250305',name:'web_search'}],
-      system:sys,
-      messages:[{role:'user',content:prompt}]
-    })
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(body)
   });
-  if(!r.ok){const e=await r.json();throw new Error(e.error?.message||`API 오류 ${r.status}`)}
+  if(!r.ok){
+    const e=await r.json();
+    const msg=e.error?.message||`API 오류 ${r.status}`;
+    throw new Error(msg);
+  }
   const d = await r.json();
-  const txt = d.content.filter(b=>b.type==='text').map(b=>b.text).join('');
-  const m = txt.replace(/```json|```/g,'').trim().match(/\{[\s\S]*\}/);
-  if(!m) throw new Error('응답 파싱 오류: JSON을 찾을 수 없습니다.');
+  const txt = (d.candidates?.[0]?.content?.parts||[]).filter(p=>p.text).map(p=>p.text).join('');
+  if(!txt) throw new Error('AI 응답이 비어있습니다. 다시 시도해주세요.');
+  const cleaned = txt.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
+  const m = cleaned.match(/\{[\s\S]*\}/);
+  if(!m) throw new Error('응답 파싱 오류: JSON을 찾을 수 없습니다. 다시 시도해주세요.');
   return JSON.parse(m[0]);
 }
 
