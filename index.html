@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>주식 인텔리전스 — AI 투자분석 플랫폼</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0c10;
+  --bg2: #10131a;
+  --bg3: #161b24;
+  --bg4: #1c2230;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #e8eaf0;
+  --text2: #8a90a0;
+  --text3: #55606e;
+  --accent: #4f8ef7;
+  --accent2: #2d6be4;
+  --gold: #e8b84b;
+  --gold2: #c9962a;
+  --green: #3ecf8e;
+  --green2: #1a9965;
+  --red: #f7615f;
+  --red2: #d94240;
+  --purple: #a78bfa;
+  --teal: #2dd4bf;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --glow-accent: 0 0 20px rgba(79,142,247,0.15);
+  --glow-gold: 0 0 20px rgba(232,184,75,0.15);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Noto Sans KR',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+
+/* ── 배경 그리드 패턴 ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(79,142,247,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79,142,247,0.03) 1px, transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;z-index:0;
+}
+
+/* ── LAYOUT ── */
+.shell{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 20px 80px}
+
+/* ── HEADER ── */
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:24px 0 20px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:32px;
+}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-mark{
+  width:38px;height:38px;
+  background:linear-gradient(135deg,var(--accent),var(--purple));
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:#fff;
+  letter-spacing:-0.5px;
+}
+.logo-text h1{font-size:17px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.logo-text p{font-size:11px;color:var(--text3);letter-spacing:0.05em;text-transform:uppercase}
+.live-pill{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;color:var(--green);
+  background:rgba(62,207,142,0.08);
+  border:1px solid rgba(62,207,142,0.2);
+  padding:5px 12px;border-radius:20px;
+  font-family:'DM Mono',monospace;
+}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.8s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+
+/* ── NAV TABS ── */
+.nav-wrap{
+  display:flex;gap:4px;
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:4px;margin-bottom:28px;
+  overflow-x:auto;
+}
+.nav-tab{
+  flex:1;min-width:100px;
+  padding:10px 8px;
+  font-size:13px;font-weight:500;
+  color:var(--text2);
+  background:none;border:none;cursor:pointer;
+  border-radius:9px;
+  transition:all 0.2s;
+  white-space:nowrap;
+  font-family:'Noto Sans KR',sans-serif;
+}
+.nav-tab:hover{color:var(--text);background:rgba(255,255,255,0.05)}
+.nav-tab.on{background:var(--bg4);color:var(--accent);border:1px solid var(--border2);box-shadow:var(--glow-accent)}
+
+/* ── PANELS ── */
+.panel{display:none;animation:fadeUp 0.25s ease}
+.panel.on{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── SEARCH ROW ── */
+.search-bar{display:flex;gap:8px;margin-bottom:14px}
+.search-bar input,.search-bar select{
+  background:var(--bg2);border:1px solid var(--border);
+  color:var(--text);
+  padding:11px 14px;border-radius:var(--radius-sm);
+  font-size:14px;font-family:'Noto Sans KR',sans-serif;
+  outline:none;transition:border-color 0.2s;
+}
+.search-bar input{flex:1}
+.search-bar input:focus,.search-bar select:focus{border-color:var(--accent)}
+.search-bar select{background-image:none;cursor:pointer}
+.search-bar select option{background:var(--bg3)}
+.btn-primary{
+  padding:11px 20px;
+  background:var(--accent);color:#fff;
+  border:none;border-radius:var(--radius-sm);
+  font-size:13px;font-weight:500;cursor:pointer;
+  font-family:'Noto Sans KR',sans-serif;
+  transition:all 0.2s;white-space:nowrap;
+}
+.btn-primary:hover{background:var(--accent2);transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+
+/* ── CHIPS ── */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+.chip{
+  font-size:12px;padding:5px 13px;
+  background:var(--bg3);border:1px solid var(--border);
+  color:var(--text2);border-radius:20px;cursor:pointer;
+  transition:all 0.15s;font-family:'Noto Sans KR',sans-serif;
+}
+.chip:hover{border-color:var(--accent);color:var(--accent);background:rgba(79,142,247,0.08)}
+.chip-label{font-size:11px;color:var(--text3);align-self:center;margin-right:2px}
+
+/* ── CARDS ── */
+.card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:20px;margin-bottom:14px;
+}
+.card-sm{padding:14px 16px;margin-bottom:10px}
+.card-label{
+  font-size:10px;font-weight:500;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--text3);margin-bottom:12px;
+  font-family:'DM Mono',monospace;
+}
+
+/* ── SIGNAL BANNER ── */
+.signal-banner{
+  border-radius:var(--radius);padding:20px 22px;margin-bottom:14px;
+  border:1px solid;display:flex;justify-content:space-between;align-items:flex-start;
+  gap:12px;
+}
+.sig-buy{background:rgba(62,207,142,0.06);border-color:rgba(62,207,142,0.25)}
+.sig-sell{background:rgba(247,97,95,0.06);border-color:rgba(247,97,95,0.25)}
+.sig-hold{background:rgba(232,184,75,0.06);border-color:rgba(232,184,75,0.25)}
+.sig-gem{background:rgba(167,139,250,0.06);border-color:rgba(167,139,250,0.25)}
+.signal-name{font-size:22px;font-weight:700;letter-spacing:-0.5px}
+.sig-buy .signal-name{color:var(--green)}
+.sig-sell .signal-name{color:var(--red)}
+.sig-hold .signal-name{color:var(--gold)}
+.sig-gem .signal-name{color:var(--purple)}
+.signal-reason{font-size:13px;color:var(--text2);margin-top:3px}
+.signal-conf{text-align:right}
+.conf-num{font-family:'DM Mono',monospace;font-size:26px;font-weight:500}
+.sig-buy .conf-num{color:var(--green)}
+.sig-sell .conf-num{color:var(--red)}
+.sig-hold .conf-num{color:var(--gold)}
+.sig-gem .conf-num{color:var(--purple)}
+.conf-label{font-size:11px;color:var(--text3)}
+
+/* ── METRICS GRID ── */
+.met-grid{display:grid;gap:10px;margin-bottom:14px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:600px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
+.met{background:var(--bg3);border-radius:var(--radius-sm);padding:14px}
+.met-l{font-size:11px;color:var(--text3);margin-bottom:4px;font-family:'DM Mono',monospace}
+.met-v{font-size:18px;font-weight:500}
+.up{color:var(--red)}
+.dn{color:var(--accent)}
+.gold-c{color:var(--gold)}
+.gem-c{color:var(--purple)}
+
+/* ── SCORE GRID ── */
+.score-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}
+@media(max-width:600px){.score-grid{grid-template-columns:repeat(2,1fr)}}
+.score-item{background:var(--bg3);border-radius:var(--radius-sm);padding:12px;text-align:center}
+.score-n{font-size:11px;color:var(--text3);margin-bottom:5px;font-family:'DM Mono',monospace}
+.score-v{font-size:18px;font-weight:500}
+.score-bar{height:3px;border-radius:2px;background:rgba(255,255,255,0.06);margin-top:6px;overflow:hidden}
+.score-fill{height:100%;border-radius:2px;transition:width 0.8s cubic-bezier(.4,0,.2,1)}
+
+/* ── RADAR CANVAS ── */
+.radar-wrap{display:flex;justify-content:center;padding:8px 0 4px}
+
+/* ── FACT LISTS ── */
+.fact-list{list-style:none;font-size:13px;line-height:1.9;color:var(--text2)}
+.fact-list li{display:flex;gap:7px;align-items:flex-start}
+.fact-list li::before{content:"▸";color:var(--text3);flex-shrink:0;margin-top:2px}
+.risk-list li::before{color:var(--red)!important}
+
+/* ── TWO COL ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+@media(max-width:560px){.two-col{grid-template-columns:1fr}}
+
+/* ── HORIZON TABS ── */
+.h-tabs{display:flex;gap:6px;margin-bottom:10px}
+.h-tab{
+  font-size:12px;padding:5px 13px;
+  border-radius:20px;border:1px solid var(--border);
+  background:none;cursor:pointer;color:var(--text3);
+  transition:all 0.15s;font-family:'Noto Sans KR',sans-serif;
+}
+.h-tab.on{background:rgba(79,142,247,0.1);border-color:var(--accent);color:var(--accent)}
+
+/* ── DETAIL TEXT ── */
+.detail{font-size:13px;line-height:1.85;color:var(--text2);white-space:pre-wrap}
+
+/* ── GEM CARDS ── */
+.gem-card{
+  background:var(--bg2);border:1px solid rgba(167,139,250,0.2);
+  border-radius:var(--radius);padding:20px;margin-bottom:12px;
+  transition:border-color 0.2s;
+}
+.gem-card:hover{border-color:rgba(167,139,250,0.4)}
+.gem-rank{
+  font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);
+  letter-spacing:0.08em;margin-bottom:8px;
+}
+.gem-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.gem-title{font-size:17px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.gem-sub{font-size:12px;color:var(--text3);margin-top:3px;font-family:'DM Mono',monospace}
+.gem-badge{
+  font-size:11px;font-weight:500;padding:4px 11px;border-radius:20px;
+  white-space:nowrap;flex-shrink:0;
+}
+.gem-score{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:var(--purple)}
+.gem-why{font-size:13px;color:var(--text2);line-height:1.75;margin-bottom:12px;border-left:2px solid rgba(167,139,250,0.3);padding-left:12px}
+.gem-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.gem-info-box{background:var(--bg3);border-radius:var(--radius-sm);padding:10px 12px}
+.gem-info-l{font-size:10px;color:var(--text3);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:3px;font-family:'DM Mono',monospace}
+.gem-info-v{font-size:13px;color:var(--text)}
+.mini-scores{display:flex;flex-direction:column;gap:5px}
+.ms-row{display:flex;align-items:center;gap:8px}
+.ms-name{font-size:11px;color:var(--text3);min-width:64px;font-family:'DM Mono',monospace}
+.ms-bar{flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+.ms-fill{height:100%;border-radius:2px}
+.ms-val{font-size:11px;font-weight:500;min-width:26px;text-align:right;font-family:'DM Mono',monospace}
+
+/* ── MARKET CARDS ── */
+.sector-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.sector-pill{
+  font-size:12px;padding:3px 10px;border-radius:20px;
+  font-family:'DM Mono',monospace;
+}
+.s-up{background:rgba(62,207,142,0.1);color:var(--green);border:1px solid rgba(62,207,142,0.2)}
+.s-dn{background:rgba(247,97,95,0.1);color:var(--red);border:1px solid rgba(247,97,95,0.2)}
+.s-watch{background:rgba(79,142,247,0.1);color:var(--accent);border:1px solid rgba(79,142,247,0.2)}
+
+/* ── PORTFOLIO ── */
+.pf-row{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding:10px 0;border-bottom:1px solid var(--border);
+}
+.pf-row:last-child{border-bottom:none}
+.pf-name{font-size:14px;font-weight:500;color:var(--text)}
+.pf-note{font-size:12px;color:var(--text3);margin-top:2px}
+.action-pill{font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;white-space:nowrap;flex-shrink:0;margin-left:10px}
+.a-buy{background:rgba(62,207,142,0.12);color:var(--green);border:1px solid rgba(62,207,142,0.25)}
+.a-sell{background:rgba(247,97,95,0.12);color:var(--red);border:1px solid rgba(247,97,95,0.25)}
+.a-hold{background:rgba(79,142,247,0.1);color:var(--accent);border:1px solid rgba(79,142,247,0.2)}
+.a-trim{background:rgba(232,184,75,0.1);color:var(--gold);border:1px solid rgba(232,184,75,0.25)}
+
+/* ── SETTINGS PANEL ── */
+.api-key-hint{font-size:12px;color:var(--text3);margin-top:6px;line-height:1.6}
+.api-key-hint a{color:var(--accent);text-decoration:none}
+.api-key-hint a:hover{text-decoration:underline}
+.key-status{display:flex;align-items:center;gap:6px;font-size:12px;font-family:'DM Mono',monospace}
+.key-ok{color:var(--green)}
+.key-no{color:var(--red2)}
+
+/* ── LOADING ── */
+.spinning{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  padding:50px 20px;color:var(--text3);font-size:14px;
+}
+.dots{display:flex;gap:5px}
+.dots i{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--accent);display:block;
+  animation:dotpulse 1.3s ease infinite;
+}
+.dots i:nth-child(2){animation-delay:0.18s}
+.dots i:nth-child(3){animation-delay:0.36s}
+@keyframes dotpulse{0%,80%,100%{opacity:0.2;transform:scale(0.9)}40%{opacity:1;transform:scale(1)}}
+
+/* ── ERROR ── */
+.err-box{
+  background:rgba(247,97,95,0.07);border:1px solid rgba(247,97,95,0.2);
+  border-radius:var(--radius-sm);padding:14px 16px;
+  font-size:13px;color:var(--red2);line-height:1.6;
+}
+
+/* ── EMPTY STATE ── */
+.empty{
+  text-align:center;padding:60px 20px;
+}
+.empty-icon{font-size:40px;margin-bottom:12px;opacity:0.3}
+.empty-title{font-size:15px;color:var(--text2);margin-bottom:6px}
+.empty-sub{font-size:13px;color:var(--text3)}
+
+/* ── TEXTAREA ── */
+textarea{
+  width:100%;background:var(--bg2);border:1px solid var(--border);
+  color:var(--text);padding:12px 14px;border-radius:var(--radius-sm);
+  font-size:13px;font-family:'Noto Sans KR',sans-serif;
+  outline:none;resize:vertical;min-height:100px;
+  line-height:1.7;transition:border-color 0.2s;
+}
+textarea:focus{border-color:var(--accent)}
+
+/* ── HISTORY DRAWER ── */
+.history-list{font-size:12px;color:var(--text2)}
+.hist-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer;
+}
+.hist-item:hover .hist-name{color:var(--accent)}
+.hist-name{color:var(--text);font-size:13px}
+.hist-time{color:var(--text3);font-family:'DM Mono',monospace;font-size:11px}
+.hist-sig{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  header{flex-direction:column;align-items:flex-start;gap:10px}
+  .search-bar{flex-wrap:wrap}
+  .search-bar input{min-width:0}
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+
+/* ── SELECT CUSTOM ── */
+select{-webkit-appearance:none;appearance:none;padding-right:28px!important;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2355606e'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;}
+
+/* ── PROGRESS BAR ── */
+.prog-bar{height:6px;border-radius:3px;background:rgba(255,255,255,0.07);margin:6px 0 0;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px}
+
+/* ── DIVIDER ── */
+.section-div{
+  font-size:10px;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--text3);font-family:'DM Mono',monospace;
+  margin:20px 0 12px;display:flex;align-items:center;gap:10px;
+}
+.section-div::after{content:'';flex:1;height:1px;background:var(--border)}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-mark">AI</div>
+    <div class="logo-text">
+      <h1>주식 인텔리전스</h1>
+      <p>AI-Powered Korea Stock Platform</p>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="key-status" id="keyStatus"><span class="key-no">● API 키 미설정</span></div>
+    <div class="live-pill"><span class="pulse"></span>실시간 AI</div>
+  </div>
+</header>
+
+<!-- NAV -->
+<div class="nav-wrap">
+  <button class="nav-tab on" onclick="goTab('analyze',this)">종목 정밀분석</button>
+  <button class="nav-tab" onclick="goTab('gems',this)">숨겨진 유망주</button>
+  <button class="nav-tab" onclick="goTab('market',this)">시장·글로벌</button>
+  <button class="nav-tab" onclick="goTab('portfolio',this)">포트폴리오</button>
+  <button class="nav-tab" onclick="goTab('settings',this)">설정</button>
+</div>
+
+<!-- ===== 종목 정밀분석 ===== -->
+<div id="tab-analyze" class="panel on">
+  <div class="search-bar">
+    <input type="text" id="stkQ" placeholder="종목명 또는 코드 입력 (예: 삼성전자, 에코프로비엠, 005930)" />
+    <select id="stkDepth">
+      <option value="full">10대 요인 종합</option>
+      <option value="value">저평가·가치분석</option>
+      <option value="growth">성장성 분석</option>
+      <option value="technical">기술적 분석</option>
+      <option value="quant">퀀트 스코어</option>
+    </select>
+    <button class="btn-primary" onclick="runAnalyze()">분석 →</button>
+  </div>
+  <div class="chips">
+    <span class="chip-label">대형주</span>
+    <button class="chip" onclick="qs('삼성전자')">삼성전자</button>
+    <button class="chip" onclick="qs('SK하이닉스')">SK하이닉스</button>
+    <button class="chip" onclick="qs('LG에너지솔루션')">LG에너지솔루션</button>
+    <button class="chip" onclick="qs('현대차')">현대차</button>
+    <button class="chip" onclick="qs('POSCO홀딩스')">POSCO홀딩스</button>
+    <button class="chip" onclick="qs('셀트리온')">셀트리온</button>
+    <span class="chip-label" style="margin-left:4px">중소형</span>
+    <button class="chip" onclick="qs('에코프로비엠')">에코프로비엠</button>
+    <button class="chip" onclick="qs('NAVER')">NAVER</button>
+    <button class="chip" onclick="qs('카카오')">카카오</button>
+    <button class="chip" onclick="qs('한화에어로스페이스')">한화에어로스페이스</button>
+  </div>
+  <div id="res-analyze">
+    <div class="empty">
+      <div class="empty-icon">📊</div>
+      <div class="empty-title">종목명을 입력하고 분석을 시작하세요</div>
+      <div class="empty-sub">10대 요인 분석 · AI 확신도 · 레이더 차트 · 기간별 전망 제공</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 숨겨진 유망주 ===== -->
+<div id="tab-gems" class="panel">
+  <div class="card">
+    <div class="card-label">유망주 탐색 조건 설정</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:5px">업종</div>
+        <select id="gemSector" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:'Noto Sans KR',sans-serif">
+          <option value="전체">전 업종</option>
+          <option value="반도체·소부장">반도체·소부장</option>
+          <option value="이차전지·에너지">이차전지·에너지</option>
+          <option value="바이오·헬스케어">바이오·헬스케어</option>
+          <option value="AI·소프트웨어">AI·소프트웨어</option>
+          <option value="방산·우주항공">방산·우주항공</option>
+          <option value="친환경·그린">친환경·그린</option>
+          <option value="소비재·유통">소비재·유통</option>
+          <option value="금융·보험">금융·보험</option>
+          <option value="건설·인프라">건설·인프라</option>
+        </select>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:5px">투자 스타일</div>
+        <select id="gemStyle" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:'Noto Sans KR',sans-serif">
+          <option value="저평가 가치주">저평가 가치주</option>
+          <option value="고성장 잠재주">고성장 잠재주</option>
+          <option value="턴어라운드주">턴어라운드</option>
+          <option value="소외 우량주">소외 우량주</option>
+          <option value="글로벌 수혜주">글로벌 수혜주</option>
+          <option value="배당성장주">배당성장주</option>
+        </select>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:5px">시가총액 규모</div>
+        <select id="gemSize" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:'Noto Sans KR',sans-serif">
+          <option value="중소형주">중소형주 위주</option>
+          <option value="소형주">소형주 (1,000억 미만)</option>
+          <option value="중형주">중형주 (1,000억~1조)</option>
+          <option value="전체">전체 시총</option>
+        </select>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:5px">투자 기간</div>
+        <select id="gemHorizon" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:'Noto Sans KR',sans-serif">
+          <option value="중기 3~6개월">중기 (3~6개월)</option>
+          <option value="단기 1~3개월">단기 (1~3개월)</option>
+          <option value="장기 6개월~2년">장기 (6개월~2년)</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="runGems()" style="width:100%;padding:13px">숨겨진 유망주 AI 발굴 →</button>
+  </div>
+  <div id="res-gems">
+    <div class="empty">
+      <div class="empty-icon">💎</div>
+      <div class="empty-title">조건을 설정하고 발굴을 시작하세요</div>
+      <div class="empty-sub">시장의 주목을 받지 못하지만 발전 가능성 있는 종목 5개를 AI가 발굴합니다</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 시장·글로벌 ===== -->
+<div id="tab-market" class="panel">
+  <div class="chips" style="margin-bottom:14px">
+    <button class="chip" onclick="runMarket('오늘 코스피 코스닥 시장 전체 흐름 주도 업종 수급 분석')">오늘 시장 동향</button>
+    <button class="chip" onclick="runMarket('이번 주 한국 증시 주요 이슈 외국인 기관 수급 동향')">이번 주 수급</button>
+    <button class="chip" onclick="runMarket('내일 한국 주식 시장 단기 전망과 공략 전략')">내일 전망</button>
+    <button class="chip" onclick="runMarket('미국 나스닥 S&P500 최신 동향과 국내 증시 영향 분석')">미국 증시</button>
+    <button class="chip" onclick="runMarket('원달러 환율 현황과 수출주 환율 영향 분석')">환율 영향</button>
+    <button class="chip" onclick="runMarket('연준 FOMC 금리 정책 전망과 한국 증시 대응 전략')">연준·금리</button>
+    <button class="chip" onclick="runMarket('글로벌 반도체 AI 수요 업황과 한국 반도체 주식 전망')">반도체 글로벌</button>
+    <button class="chip" onclick="runMarket('중국 경기 회복 동향과 한국 소재 산업재 수혜 분석')">중국 경기</button>
+    <button class="chip" onclick="runMarket('한국 주식 시장 신규 상장 공모주 투자 가치 분석')">공모주 동향</button>
+  </div>
+  <div class="search-bar" style="margin-bottom:14px">
+    <input type="text" id="mktQ" placeholder="분석할 시장 이슈·테마·글로벌 이벤트 직접 입력..." />
+    <button class="btn-primary" onclick="runMarket()">분석 →</button>
+  </div>
+  <div id="res-market">
+    <div class="empty">
+      <div class="empty-icon">🌐</div>
+      <div class="empty-title">위 버튼을 클릭하거나 직접 입력하세요</div>
+      <div class="empty-sub">코스피·코스닥·글로벌 시장 실시간 분석 제공</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 포트폴리오 ===== -->
+<div id="tab-portfolio" class="panel">
+  <div class="card">
+    <div class="card-label">보유 종목 입력</div>
+    <textarea id="pfInput" placeholder="종목명 수량 평균단가 형식으로 입력하세요&#10;예시:&#10;삼성전자 100주 75,000원&#10;SK하이닉스 30주 150,000원&#10;에코프로비엠 5주 250,000원&#10;NAVER 15주 190,000원&#10;한화에어로스페이스 20주 280,000원"></textarea>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">투자 성향</div>
+        <select id="pfRisk" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:'Noto Sans KR',sans-serif">
+          <option value="균형형">균형형</option>
+          <option value="공격형">공격형</option>
+          <option value="안정형">안정형</option>
+        </select>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">투자 목표</div>
+        <input type="text" id="pfGoal" placeholder="예: 1년 내 25% 수익" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:'Noto Sans KR',sans-serif" />
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">투자 기간</div>
+        <select id="pfHorizon" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:'Noto Sans KR',sans-serif">
+          <option>6개월</option><option>1년</option><option>2년 이상</option><option>단기 3개월</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="runPortfolio()" style="width:100%;margin-top:12px;padding:13px">포트폴리오 AI 정밀 진단 →</button>
+  </div>
+  <div id="res-portfolio">
+    <div class="empty">
+      <div class="empty-icon">💼</div>
+      <div class="empty-title">보유 종목을 입력하고 진단을 시작하세요</div>
+      <div class="empty-sub">종목별 진단 · 리밸런싱 권고 · 추가 매수 후보 제공</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 설정 ===== -->
+<div id="tab-settings" class="panel">
+  <div class="card">
+    <div class="card-label">Anthropic API 키 설정</div>
+    <div style="display:flex;gap:8px">
+      <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:'DM Mono',monospace" />
+      <button class="btn-primary" onclick="saveKey()">저장</button>
+    </div>
+    <div class="api-key-hint">
+      API 키는 브라우저 로컬 스토리지에만 저장되며 외부로 전송되지 않습니다.<br>
+      키 발급: <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">분석 기록</div>
+    <div id="historyList">
+      <div style="font-size:13px;color:var(--text3);text-align:center;padding:20px">분석 기록이 없습니다</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">시스템 정보</div>
+    <div style="font-size:13px;color:var(--text2);line-height:2">
+      <div>플랫폼: <span style="color:var(--accent);font-family:'DM Mono',monospace">주식 인텔리전스 v2.0</span></div>
+      <div>AI 모델: <span style="color:var(--accent);font-family:'DM Mono',monospace">Claude claude-sonnet-4-20250514 + Web Search</span></div>
+      <div>분석 방식: <span style="color:var(--text)">10대 요인 다변량 분석 + 실시간 웹 검색</span></div>
+      <div>지원 시장: <span style="color:var(--text)">코스피·코스닥·코넥스</span></div>
+      <div style="margin-top:10px;padding:10px;background:rgba(247,97,95,0.07);border:1px solid rgba(247,97,95,0.15);border-radius:var(--radius-sm);font-size:12px;color:var(--text3)">
+        ⚠ 이 플랫폼은 투자 정보 제공 목적이며, 실제 투자 결정은 본인의 판단과 책임 하에 진행해 주세요. 과거 수익률이 미래를 보장하지 않습니다.
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /shell -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+/* ─ GLOBAL STATE ─ */
+let API_KEY = localStorage.getItem('si_api_key') || '';
+const HISTORY = JSON.parse(localStorage.getItem('si_history') || '[]');
+
+/* ─ INIT ─ */
+(function init(){
+  if(API_KEY){
+    document.getElementById('apiKeyInput').value = API_KEY;
+    document.getElementById('keyStatus').innerHTML = '<span class="key-ok">● API 키 설정됨</span>';
+  }
+  renderHistory();
+})();
+
+function saveKey(){
+  const v = document.getElementById('apiKeyInput').value.trim();
+  if(!v){alert('API 키를 입력해주세요');return}
+  API_KEY = v;
+  localStorage.setItem('si_api_key', v);
+  document.getElementById('keyStatus').innerHTML = '<span class="key-ok">● API 키 설정됨</span>';
+  alert('API 키가 저장되었습니다.');
+}
+
+/* ─ TAB ─ */
+function goTab(id, btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('tab-'+id).classList.add('on');
+  btn.classList.add('on');
+}
+function qs(n){ document.getElementById('stkQ').value=n; runAnalyze(); }
+
+function spin(id, msg){
+  document.getElementById(id).innerHTML = `<div class="spinning"><div class="dots"><i></i><i></i><i></i></div>${msg||'AI 분석 중...'}</div>`;
+}
+function showErr(id, m){
+  document.getElementById(id).innerHTML = `<div class="err-box">${m}</div>`;
+}
+
+/* ─ AI CALL ─ */
+async function callAI(sys, prompt){
+  if(!API_KEY) throw new Error('API 키가 설정되지 않았습니다. 설정 탭에서 Anthropic API 키를 입력해주세요.');
+  const r = await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:2000,
+      tools:[{type:'web_search_20250305',name:'web_search'}],
+      system:sys,
+      messages:[{role:'user',content:prompt}]
+    })
+  });
+  if(!r.ok){const e=await r.json();throw new Error(e.error?.message||`API 오류 ${r.status}`)}
+  const d = await r.json();
+  const txt = d.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+  const m = txt.replace(/```json|```/g,'').trim().match(/\{[\s\S]*\}/);
+  if(!m) throw new Error('응답 파싱 오류: JSON을 찾을 수 없습니다.');
+  return JSON.parse(m[0]);
+}
+
+/* ─ HISTORY ─ */
+function addHistory(type, name, signal){
+  HISTORY.unshift({type,name,signal,time:new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})});
+  if(HISTORY.length>20) HISTORY.pop();
+  localStorage.setItem('si_history', JSON.stringify(HISTORY));
+  renderHistory();
+}
+function renderHistory(){
+  const el = document.getElementById('historyList');
+  if(!HISTORY.length){el.innerHTML='<div style="font-size:13px;color:var(--text3);text-align:center;padding:20px">분석 기록이 없습니다</div>';return}
+  const sigColor={'BUY':'var(--green)','SELL':'var(--red)','HOLD':'var(--gold)','BULLISH':'var(--green)','BEARISH':'var(--red)','NEUTRAL':'var(--gold)'};
+  el.innerHTML = HISTORY.map(h=>`
+    <div class="hist-item" onclick="">
+      <div><span class="hist-name">${h.name}</span> <span style="font-size:11px;color:var(--text3)">${h.type}</span></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;font-weight:500;color:${sigColor[h.signal]||'var(--text3)'}">${h.signal}</span>
+        <span class="hist-time">${h.time}</span>
+      </div>
+    </div>`).join('');
+}
+
+/* ─ SCORE COLORS ─ */
+function sc(v){if(v>=80)return'var(--green)';if(v>=65)return'var(--accent)';if(v>=50)return'var(--gold)';return'var(--red)'}
+
+/* ─ RADAR CHART ─ */
+function renderRadar(scores, cid){
+  setTimeout(()=>{
+    const ctx = document.getElementById(cid);
+    if(!ctx||!window.Chart) return;
+    new Chart(ctx,{
+      type:'radar',
+      data:{
+        labels:Object.keys(scores),
+        datasets:[{
+          data:Object.values(scores),
+          backgroundColor:'rgba(79,142,247,0.1)',
+          borderColor:'rgba(79,142,247,0.6)',
+          borderWidth:1.5,
+          pointBackgroundColor:'rgba(79,142,247,0.9)',
+          pointRadius:3,
+          pointHoverRadius:4
+        }]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{r:{
+          min:0,max:100,
+          ticks:{stepSize:25,font:{size:9},color:'rgba(255,255,255,0.2)',backdropColor:'transparent'},
+          pointLabels:{font:{size:10},color:'rgba(255,255,255,0.45)'},
+          grid:{color:'rgba(255,255,255,0.06)'},
+          angleLines:{color:'rgba(255,255,255,0.06)'}
+        }}
+      }
+    });
+  },150);
+}
+
+/* ─ SYSTEMS PROMPTS ─ */
+const SYS_STK = `당신은 세계 최고 수준의 한국 주식 애널리스트입니다. 실시간 웹 검색으로 최신 데이터를 수집하여 10가지 핵심 요인을 정밀 분석합니다.
+반드시 순수 JSON만 반환하세요 (마크다운, 설명 텍스트 없이):
+{"name":"종목명","code":"종목코드","signal":"BUY|SELL|HOLD","confidence":85,"signalTitle":"신호 한줄 제목","signalReason":"매매 근거 한줄","price":"현재가","change":"등락률(예:+2.3%)","targetLow":"목표주가 하단","targetHigh":"목표주가 상단","upside":"상승여력(예:+18%)","scores":{"가치":72,"성장성":68,"수익성":75,"재무건전성":80,"모멘텀":65,"기술적신호":58,"업황":70,"글로벌연동":62,"수급":55,"리스크관리":78},"totalScore":68,"strengths":["강점1","강점2","강점3","강점4"],"weaknesses":["약점1","약점2","약점3"],"shortTerm":"단기(1~4주) 전망 2문장","midTerm":"중기(1~3개월) 전망 2문장","longTerm":"장기(6개월+) 전망 2문장","catalysts":["촉매1","촉매2","촉매3"],"risks":["리스크1","리스크2"],"analystView":"전문가 종합 견해 400자 이내","action":"구체적 투자 액션 플랜 200자 이내"}`;
+
+const SYS_GEMS = `당신은 소외된 저평가 유망주를 발굴하는 전문 투자 리서처입니다. 실시간 웹 검색으로 최신 실적·업황·수급을 확인하여 시장의 주목을 받지 못하지만 실질적 성장 잠재력 있는 종목 5개를 발굴합니다. 대형주나 이미 많이 오른 종목보다 발전 가능성 있는 숨겨진 종목을 찾아주세요.
+반드시 순수 JSON만 반환하세요:
+{"gems":[{"name":"종목명","code":"종목코드","sector":"업종","marketCap":"시가총액","gemType":"저평가가치|고성장잠재|턴어라운드|소외우량|글로벌수혜|배당성장","gemScore":85,"why":"왜 지금 주목해야 하는지 핵심 이유 3문장. 구체적 수치와 근거 포함","catalyst":"핵심 상승 촉매 (구체적)","risk":"주요 리스크","targetReturn":"목표수익률 예: +35%","horizon":"투자기간","scores":{"저평가도":80,"성장성":75,"업황개선":70,"글로벌수혜":65,"재무안정":78}}]}`;
+
+const SYS_MKT = `당신은 한국·글로벌 주식시장 전문 스트래티지스트입니다. 실시간 웹 검색으로 최신 시장 데이터를 수집하여 정확한 분석과 전략을 제시합니다.
+반드시 순수 JSON만 반환하세요:
+{"title":"분석 제목","signal":"BULLISH|BEARISH|NEUTRAL","confidence":75,"summary":"핵심 요약 2문장","keyPoints":["포인트1","포인트2","포인트3","포인트4","포인트5"],"sectorWatch":{"강세업종":["업종1","업종2","업종3"],"약세업종":["업종1","업종2"],"관심업종":["업종1","업종2"]},"globalFactors":["글로벌요인1","요인2","요인3"],"strategy":"구체적 투자 전략 300자","watchlist":["주목종목1","종목2","종목3","종목4"],"risk":"주요 리스크","shortOutlook":"단기 전망 2문장","midOutlook":"중기 전망 2문장"}`;
+
+const SYS_PF = `당신은 한국 주식 전문 포트폴리오 매니저입니다. 보유 종목의 집중도·업종배분·리스크·수익성을 정밀 분석하고 최적화 전략을 제시합니다.
+반드시 순수 JSON만 반환하세요:
+{"overallScore":72,"signal":"REBALANCE|HOLD|OPTIMIZE","summary":"포트폴리오 현황 요약 2문장","concentration":"집중도 평가","sectorBalance":"업종 배분 평가","riskLevel":"LOW|MEDIUM|HIGH","stocks":[{"name":"종목명","assessment":"현황평가","action":"보유|비중확대|비중축소|매도","reason":"구체적 이유"}],"rebalancing":["리밸런싱권고1","권고2","권고3","권고4"],"addCandidates":["추가매수후보1","후보2","후보3"],"totalReturn":"예상수익률범위","strategy":"포트폴리오 전략 300자"}`;
+
+/* ─ RENDER HELPERS ─ */
+function renderStockResult(d, stk){
+  const sigC = d.signal==='BUY'?'sig-buy':d.signal==='SELL'?'sig-sell':'sig-hold';
+  const sigE = d.signal==='BUY'?'▲ 매수 신호':d.signal==='SELL'?'▼ 매도 신호':'■ 관망';
+  const scores = d.scores||{};
+  const cid = 'r'+Date.now();
+  const hid = 'h'+Date.now();
+
+  const scoreHtml = Object.entries(scores).map(([k,v])=>`
+    <div class="score-item">
+      <div class="score-n">${k}</div>
+      <div class="score-v" style="color:${sc(v)}">${v}</div>
+      <div class="score-bar"><div class="score-fill" style="width:${v}%;background:${sc(v)}"></div></div>
+    </div>`).join('');
+
+  const confC = d.confidence>=80?'var(--green)':d.confidence>=60?'var(--accent)':'var(--gold)';
+  const chg = String(d.change||'');
+  const isUp = !chg.includes('-');
+
+  document.getElementById('res-analyze').innerHTML = `
+    <div class="signal-banner ${sigC}">
+      <div>
+        <div class="signal-name">${sigE} · ${d.name||stk}</div>
+        <div class="signal-reason">${d.signalReason||''}</div>
+      </div>
+      <div class="signal-conf">
+        <div class="conf-num" style="color:${confC}">${d.confidence||0}%</div>
+        <div class="conf-label">AI 확신도</div>
+      </div>
+    </div>
+
+    <div class="met-grid g4">
+      <div class="met"><div class="met-l">현재가</div><div class="met-v">${d.price||'—'}</div></div>
+      <div class="met"><div class="met-l">등락률</div><div class="met-v ${isUp?'up':'dn'}">${d.change||'—'}</div></div>
+      <div class="met"><div class="met-l">목표주가</div><div class="met-v gold-c" style="font-size:14px">${d.targetLow||'—'} ~ ${d.targetHigh||''}</div></div>
+      <div class="met"><div class="met-l">상승여력</div><div class="met-v up">${d.upside||'—'}</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">10대 요인 스코어 — 종합 ${d.totalScore||0}점</div>
+      <div class="score-grid">${scoreHtml}</div>
+      <div class="radar-wrap"><div style="width:280px;height:230px"><canvas id="${cid}"></canvas></div></div>
+    </div>
+
+    <div class="two-col">
+      <div class="card" style="margin-bottom:0">
+        <div class="card-label">강점 요인</div>
+        <ul class="fact-list">${(d.strengths||[]).map(s=>`<li>${s}</li>`).join('')}</ul>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div class="card-label">약점·리스크</div>
+        <ul class="fact-list risk-list">${(d.weaknesses||[]).map(w=>`<li>${w}</li>`).join('')}</ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="card-label">기간별 전망</div>
+      <div class="h-tabs">
+        <button class="h-tab on" onclick="switchHorizon(this,'${hid}','s')">단기 1~4주</button>
+        <button class="h-tab" onclick="switchHorizon(this,'${hid}','m')">중기 1~3개월</button>
+        <button class="h-tab" onclick="switchHorizon(this,'${hid}','l')">장기 6개월+</button>
+      </div>
+      <div id="${hid}" class="detail">${d.shortTerm||''}</div>
+    </div>
+
+    <div class="two-col">
+      <div class="card" style="margin-bottom:0"><div class="card-label">상승 촉매</div><ul class="fact-list">${(d.catalysts||[]).map(c=>`<li>${c}</li>`).join('')}</ul></div>
+      <div class="card" style="margin-bottom:0"><div class="card-label">핵심 리스크</div><ul class="fact-list risk-list">${(d.risks||[]).map(r=>`<li>${r}</li>`).join('')}</ul></div>
+    </div>
+
+    <div class="card" style="margin-top:12px"><div class="card-label">애널리스트 종합 견해</div><div class="detail">${d.analystView||''}</div></div>
+    <div class="card"><div class="card-label">투자 액션 플랜</div><div class="detail">${d.action||''}</div></div>
+  `;
+
+  // store horizon data on window
+  window[hid] = {s:d.shortTerm||'',m:d.midTerm||'',l:d.longTerm||''};
+  renderRadar(scores, cid);
+}
+
+function switchHorizon(btn, hid, k){
+  btn.closest('.card').querySelectorAll('.h-tab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById(hid).textContent = (window[hid]||{})[k]||'';
+}
+
+/* ─ ACTIONS ─ */
+async function runAnalyze(){
+  const stk = document.getElementById('stkQ').value.trim();
+  const depth = document.getElementById('stkDepth').value;
+  if(!stk){alert('종목명을 입력해주세요');return}
+  const depthMap={full:'10대 요인 종합',value:'가치·저평가',growth:'성장성',technical:'기술적',quant:'퀀트스코어'};
+  spin('res-analyze', `${stk} 정밀 분석 중...`);
+  const today = new Date().toLocaleDateString('ko-KR');
+  try{
+    const d = await callAI(SYS_STK, `${today} 기준 ${stk} ${depthMap[depth]} 분석. 최신 주가·실적·업황·수급·글로벌 연동 데이터 포함. 모든 수치는 최신 데이터 기반.`);
+    renderStockResult(d, stk);
+    addHistory('종목분석', d.name||stk, d.signal);
+  }catch(e){showErr('res-analyze','분석 오류: '+e.message)}
+}
+
+async function runGems(){
+  const sector = document.getElementById('gemSector').value;
+  const style = document.getElementById('gemStyle').value;
+  const size = document.getElementById('gemSize').value;
+  const horizon = document.getElementById('gemHorizon').value;
+  spin('res-gems', '시장에서 숨겨진 유망 종목 발굴 중...');
+  const today = new Date().toLocaleDateString('ko-KR');
+  try{
+    const d = await callAI(SYS_GEMS,
+      `${today} 기준. 업종:${sector}, 스타일:${style}, 규모:${size}, 투자기간:${horizon}. 시장에서 주목받지 못하지만 발전 가능성이 높은 숨겨진 종목 5개 발굴. 최신 실적·공시·업황 변화 반영 필수.`
+    );
+    const gems = Array.isArray(d)?d:(d.gems||[]);
+    const typeColor={'저평가가치':'#4f8ef7','고성장잠재':'#3ecf8e','턴어라운드':'#e8b84b','소외우량':'#a78bfa','글로벌수혜':'#2dd4bf','배당성장':'#f7615f'};
+    let html = `<div style="font-size:12px;color:var(--text3);margin-bottom:14px;font-family:'DM Mono',monospace">AI 발굴 결과 ${gems.length}종목 · ${today}</div>`;
+    gems.forEach((g,i)=>{
+      const tc = typeColor[g.gemType]||'var(--purple)';
+      const sc2 = g.scores||{};
+      html += `
+      <div class="gem-card">
+        <div class="gem-rank">PICK ${String(i+1).padStart(2,'0')}</div>
+        <div class="gem-header">
+          <div>
+            <div class="gem-title">${g.name||''} <span style="font-size:13px;color:var(--text3);font-family:'DM Mono',monospace">${g.code||''}</span></div>
+            <div class="gem-sub">${g.sector||''} · ${g.marketCap||''}</div>
+          </div>
+          <div style="text-align:right">
+            <span class="gem-badge" style="background:${tc}18;color:${tc};border:1px solid ${tc}44">${g.gemType||'유망주'}</span>
+            <div class="gem-score" style="margin-top:4px;color:${tc}">${g.gemScore||0}점</div>
+          </div>
+        </div>
+        <div class="gem-why">${g.why||''}</div>
+        <div class="gem-info-grid">
+          <div class="gem-info-box"><div class="gem-info-l">핵심 촉매</div><div class="gem-info-v">${g.catalyst||'—'}</div></div>
+          <div class="gem-info-box"><div class="gem-info-l">주요 리스크</div><div class="gem-info-v">${g.risk||'—'}</div></div>
+          <div class="gem-info-box"><div class="gem-info-l">목표 수익률</div><div class="gem-info-v" style="color:${tc};font-weight:500">${g.targetReturn||'—'}</div></div>
+          <div class="gem-info-box"><div class="gem-info-l">투자 기간</div><div class="gem-info-v">${g.horizon||'—'}</div></div>
+        </div>
+        <div class="mini-scores">
+          ${Object.entries(sc2).map(([k,v])=>`
+            <div class="ms-row">
+              <div class="ms-name">${k}</div>
+              <div class="ms-bar"><div class="ms-fill" style="width:${v}%;background:${tc}"></div></div>
+              <div class="ms-val" style="color:${tc}">${v}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    });
+    document.getElementById('res-gems').innerHTML = html;
+    addHistory('유망주발굴', `${sector} ${style}`, 'BUY');
+  }catch(e){showErr('res-gems','발굴 오류: '+e.message)}
+}
+
+async function runMarket(preset){
+  const q = preset || document.getElementById('mktQ').value.trim();
+  if(!q){alert('분석할 내용을 입력해주세요');return}
+  if(!preset) document.getElementById('mktQ').value='';
+  spin('res-market','시장 동향 분석 중...');
+  const today = new Date().toLocaleDateString('ko-KR');
+  try{
+    const d = await callAI(SYS_MKT, `${today} 기준: ${q}`);
+    const sigC = d.signal==='BULLISH'?'sig-buy':d.signal==='BEARISH'?'sig-sell':'sig-hold';
+    const sigE = d.signal==='BULLISH'?'▲ 강세':d.signal==='BEARISH'?'▼ 약세':'■ 중립';
+    const sw = d.sectorWatch||{};
+    const confC = d.confidence>=70?'var(--green)':d.confidence>=50?'var(--gold)':'var(--red)';
+    document.getElementById('res-market').innerHTML = `
+      <div class="signal-banner ${sigC}">
+        <div>
+          <div class="signal-name">${sigE} 전망</div>
+          <div class="signal-reason">${d.title||''}</div>
+        </div>
+        <div class="signal-conf">
+          <div class="conf-num" style="color:${confC}">${d.confidence||0}%</div>
+          <div class="conf-label">신뢰도</div>
+        </div>
+      </div>
+
+      <div class="card"><div class="card-label">핵심 요약</div>
+        <div class="detail" style="margin-bottom:12px">${d.summary||''}</div>
+        <ul class="fact-list">${(d.keyPoints||[]).map(p=>`<li>${p}</li>`).join('')}</ul>
+      </div>
+
+      <div class="met-grid g3">
+        <div class="met">
+          <div class="met-l" style="color:var(--green)">강세 업종</div>
+          <div class="sector-row" style="margin-top:6px">${(sw['강세업종']||[]).map(s=>`<span class="sector-pill s-up">${s}</span>`).join('')||'—'}</div>
+        </div>
+        <div class="met">
+          <div class="met-l" style="color:var(--accent)">관심 업종</div>
+          <div class="sector-row" style="margin-top:6px">${(sw['관심업종']||[]).map(s=>`<span class="sector-pill s-watch">${s}</span>`).join('')||'—'}</div>
+        </div>
+        <div class="met">
+          <div class="met-l" style="color:var(--red)">약세 업종</div>
+          <div class="sector-row" style="margin-top:6px">${(sw['약세업종']||[]).map(s=>`<span class="sector-pill s-dn">${s}</span>`).join('')||'—'}</div>
+        </div>
+      </div>
+
+      <div class="card"><div class="card-label">글로벌 요인</div>
+        <ul class="fact-list">${(d.globalFactors||[]).map(f=>`<li>${f}</li>`).join('')}</ul>
+      </div>
+
+      <div class="two-col">
+        <div class="card" style="margin-bottom:0"><div class="card-label">단기 전망</div><div class="detail">${d.shortOutlook||''}</div></div>
+        <div class="card" style="margin-bottom:0"><div class="card-label">중기 전망</div><div class="detail">${d.midOutlook||''}</div></div>
+      </div>
+
+      <div class="card" style="margin-top:12px"><div class="card-label">투자 전략</div><div class="detail">${d.strategy||''}</div></div>
+
+      <div class="card">
+        <div class="card-label">주목 종목 → 클릭하면 바로 분석</div>
+        <div class="chips" style="margin-bottom:0">${(d.watchlist||[]).map(w=>`<button class="chip" onclick="document.querySelectorAll('.nav-tab')[0].click();qs('${w}')">${w} →</button>`).join('')}</div>
+      </div>
+    `;
+    addHistory('시장분석', d.title||q.substring(0,15), d.signal);
+  }catch(e){showErr('res-market','분석 오류: '+e.message)}
+}
+
+async function runPortfolio(){
+  const pf = document.getElementById('pfInput').value.trim();
+  const goal = document.getElementById('pfGoal').value.trim();
+  const risk = document.getElementById('pfRisk').value;
+  const horizon = document.getElementById('pfHorizon').value;
+  if(!pf){alert('보유 종목을 입력해주세요');return}
+  spin('res-portfolio','포트폴리오 정밀 진단 중...');
+  const today = new Date().toLocaleDateString('ko-KR');
+  try{
+    const d = await callAI(SYS_PF,`${today} 기준\n투자성향:${risk}\n투자기간:${horizon}\n${goal?'목표:'+goal+'\n':''}\n보유종목:\n${pf}`);
+    const rlC = d.riskLevel==='HIGH'?'var(--red)':d.riskLevel==='MEDIUM'?'var(--gold)':'var(--green)';
+    const scC = d.overallScore>=70?'var(--green)':d.overallScore>=50?'var(--gold)':'var(--red)';
+    const sigC = d.signal==='OPTIMIZE'?'sig-buy':d.signal==='REBALANCE'?'sig-hold':'sig-hold';
+    const actionColor={'보유':'a-hold','비중확대':'a-buy','비중축소':'a-trim','매도':'a-sell'};
+    document.getElementById('res-portfolio').innerHTML = `
+      <div class="signal-banner ${sigC}">
+        <div>
+          <div class="signal-name" style="color:${scC}">종합 ${d.overallScore||0}점</div>
+          <div class="signal-reason">${d.summary||''}</div>
+        </div>
+        <div class="signal-conf">
+          <div style="font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:${rlC}">리스크 ${d.riskLevel||''}</div>
+          <div class="conf-label">예상 ${d.totalReturn||'—'}</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card" style="margin-bottom:0"><div class="card-label">집중도 평가</div><div class="detail">${d.concentration||''}</div></div>
+        <div class="card" style="margin-bottom:0"><div class="card-label">업종 배분</div><div class="detail">${d.sectorBalance||''}</div></div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div class="card-label">종목별 진단</div>
+        ${(d.stocks||[]).map(s=>`
+          <div class="pf-row">
+            <div><div class="pf-name">${s.name}</div><div class="pf-note">${s.reason||''}</div></div>
+            <span class="action-pill ${actionColor[s.action]||'a-hold'}">${s.action}</span>
+          </div>`).join('')}
+      </div>
+
+      <div class="card"><div class="card-label">리밸런싱 권고</div>
+        <ul class="fact-list">${(d.rebalancing||[]).map(r=>`<li>${r}</li>`).join('')}</ul>
+      </div>
+
+      <div class="card">
+        <div class="card-label">추가 매수 후보 → 클릭하면 바로 분석</div>
+        <div class="chips" style="margin-bottom:0">${(d.addCandidates||[]).map(c=>`<button class="chip" onclick="document.querySelectorAll('.nav-tab')[0].click();qs('${c}')">${c} →</button>`).join('')}</div>
+      </div>
+
+      <div class="card"><div class="card-label">포트폴리오 전략</div><div class="detail">${d.strategy||''}</div></div>
+    `;
+    addHistory('포트폴리오', '포트폴리오 진단', d.signal);
+  }catch(e){showErr('res-portfolio','진단 오류: '+e.message)}
+}
+
+/* ─ KEYBOARD SHORTCUTS ─ */
+document.getElementById('stkQ').addEventListener('keydown',e=>{if(e.key==='Enter')runAnalyze()});
+document.getElementById('mktQ').addEventListener('keydown',e=>{if(e.key==='Enter')runMarket()});
+</script>
+</body>
+</html>
