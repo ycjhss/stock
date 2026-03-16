@@ -568,13 +568,50 @@ select{-webkit-appearance:none;appearance:none;padding-right:28px!important;
 <div id="tab-settings" class="panel">
   <div class="card">
     <div class="card-label">Anthropic API 키 설정</div>
-    <div style="display:flex;gap:8px">
-      <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:'DM Mono',monospace" />
-      <button class="btn-primary" onclick="saveKey()">저장</button>
+
+    <!-- 단계별 안내 -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
+      <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:12px">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);margin-bottom:5px">STEP 01</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.6"><a href="https://console.anthropic.com" target="_blank" style="color:var(--accent);text-decoration:none">console.anthropic.com</a> 접속 후 로그인</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:12px">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);margin-bottom:5px">STEP 02</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.6">왼쪽 메뉴 <b style="color:var(--text)">API Keys</b> → <b style="color:var(--text)">Create Key</b></div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:12px">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);margin-bottom:5px">STEP 03</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.6">생성된 키 전체 복사 후 아래 입력</div>
+      </div>
     </div>
-    <div class="api-key-hint">
-      API 키는 브라우저 로컬 스토리지에만 저장되며 외부로 전송되지 않습니다.<br>
-      키 발급: <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys
+
+    <!-- 키 입력 -->
+    <div style="position:relative;margin-bottom:8px">
+      <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-XXXX...XXXX (전체 붙여넣기)"
+        style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:13px 44px 13px 14px;border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:'DM Mono',monospace;transition:border-color 0.2s"
+        oninput="validateKeyInput(this)"
+        onfocus="this.style.borderColor='var(--accent)'"
+        onblur="this.style.borderColor='var(--border)'" />
+      <span id="keyInputIcon" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:14px"></span>
+    </div>
+
+    <!-- 저장/삭제 버튼 -->
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="btn-primary" onclick="saveKey()" style="flex:1;padding:12px">✓ API 키 저장</button>
+      <button onclick="clearKey()" style="padding:12px 18px;background:none;border:1px solid var(--border);color:var(--text2);border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">삭제</button>
+    </div>
+
+    <!-- 저장된 키 미리보기 -->
+    <div id="keyPreview" style="display:none;background:rgba(62,207,142,0.07);border:1px solid rgba(62,207,142,0.2);border-radius:var(--radius-sm);padding:10px 14px;font-family:'DM Mono',monospace;font-size:12px;color:var(--green)"></div>
+
+    <!-- 주의사항 -->
+    <div style="margin-top:12px;padding:12px;background:rgba(79,142,247,0.05);border:1px solid rgba(79,142,247,0.12);border-radius:var(--radius-sm)">
+      <div style="font-size:11px;color:var(--text3);line-height:1.9">
+        🔒 키는 <b style="color:var(--text2)">본인 브라우저에만 저장</b>되며 서버로 전송되지 않습니다<br>
+        💰 분석 1회 비용: 약 <b style="color:var(--text2)">$0.003~0.01 (4~15원)</b> 수준<br>
+        ⚠️ 키가 <b style="color:var(--text2)">sk-ant-</b>로 시작하는지 확인하세요<br>
+        ❓ 오류 발생 시 키를 삭제 후 다시 복사·저장해 보세요
+      </div>
     </div>
   </div>
   <div class="card">
@@ -602,14 +639,24 @@ select{-webkit-appearance:none;appearance:none;padding-right:28px!important;
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
 /* ─ GLOBAL STATE ─ */
-let API_KEY = localStorage.getItem('si_api_key') || '';
+let API_KEY = (localStorage.getItem('si_api_key') || '').trim();
 const HISTORY = JSON.parse(localStorage.getItem('si_history') || '[]');
 
 /* ─ INIT ─ */
+function validateKeyInput(el){
+  const v=el.value.trim();
+  const icon=document.getElementById('keyInputIcon');
+  if(!v){icon.textContent='';el.style.borderColor='var(--border)';return}
+  if(v.startsWith('sk-ant-')&&v.length>30){el.style.borderColor='var(--green)';icon.textContent='✓';icon.style.color='var(--green)';}
+  else{el.style.borderColor='var(--red)';icon.textContent='✗';icon.style.color='var(--red)';}
+}
 (function init(){
   if(API_KEY){
     document.getElementById('apiKeyInput').value = API_KEY;
     document.getElementById('keyStatus').innerHTML = '<span class="key-ok">● API 키 설정됨</span>';
+    const masked = API_KEY.substring(0,14)+'••••••••'+API_KEY.substring(API_KEY.length-4);
+    const prev = document.getElementById('keyPreview');
+    if(prev){ prev.textContent='저장된 키: '+masked; prev.style.display='block'; }
   }
   renderHistory();
 })();
@@ -617,10 +664,25 @@ const HISTORY = JSON.parse(localStorage.getItem('si_history') || '[]');
 function saveKey(){
   const v = document.getElementById('apiKeyInput').value.trim();
   if(!v){alert('API 키를 입력해주세요');return}
+  if(!v.startsWith('sk-ant-')){
+    alert('⚠️ 올바른 API 키 형식이 아닙니다.\n\n키는 반드시 sk-ant- 로 시작해야 합니다.\nconsole.anthropic.com → API Keys 에서\n키를 처음부터 끝까지 다시 복사해주세요.');
+    return;
+  }
   API_KEY = v;
   localStorage.setItem('si_api_key', v);
+  const masked = v.substring(0,14)+'••••••••'+v.substring(v.length-4);
   document.getElementById('keyStatus').innerHTML = '<span class="key-ok">● API 키 설정됨</span>';
-  alert('API 키가 저장되었습니다.');
+  const prev = document.getElementById('keyPreview');
+  if(prev){ prev.textContent = masked; prev.style.display='block'; }
+  alert('✓ API 키가 저장되었습니다!');
+}
+function clearKey(){
+  API_KEY='';
+  localStorage.removeItem('si_api_key');
+  document.getElementById('apiKeyInput').value='';
+  document.getElementById('keyStatus').innerHTML='<span class="key-no">● API 키 미설정</span>';
+  const prev=document.getElementById('keyPreview');
+  if(prev) prev.style.display='none';
 }
 
 /* ─ TAB ─ */
